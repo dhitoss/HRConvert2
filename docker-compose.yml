@@ -3,12 +3,7 @@ version: '3.8'
 services:
   hrconvert2:
     build: .
-    container_name: hrconvert2
-    ports:
-      - "80:80"
     volumes:
-      # Monta o diretório de dados (por exemplo, para arquivos temporários de conversão)
       - ./data:/var/www/html/HRConvert2/ConvertLoc
-      # Se precisar persistir ou customizar o config.php, mapeie-o também:
       - ./config.php:/var/www/html/HRConvert2/Resources/config.php
     restart: always
