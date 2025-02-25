@@ -1,7 +1,12 @@
-# Use uma imagem oficial do PHP com Apache
+# Use uma imagem base do PHP com Apache
 FROM php:8.0-apache
 
-# Atualize os repositórios e instale as dependências necessárias
+# Adiciona repositórios non-free ao sources.list
+RUN echo "deb http://deb.debian.org/debian bullseye main non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bullseye-security main non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bullseye-updates main non-free" >> /etc/apt/sources.list
+
+# Atualiza e instala as dependências necessárias
 RUN apt-get update && apt-get install -y \
     libreoffice-core \
     libreoffice-java-common \
@@ -23,19 +28,18 @@ RUN apt-get update && apt-get install -y \
     gnuplot \
  && rm -rf /var/lib/apt/lists/*
 
-# Ativa o módulo rewrite do Apache (se necessário para a aplicação)
+# Ativa o módulo rewrite do Apache (se necessário)
 RUN a2enmod rewrite
 
-# Cria o diretório para o HRConvert2 e copia os arquivos da aplicação para lá
-# (Certifique-se de que o diretório HRConvert2 está na mesma pasta do Dockerfile)
+# Copia os arquivos da aplicação para o diretório do Apache
 COPY . /var/www/html/HRConvert2
 
-# Ajusta as permissões para que o Apache (usuário www-data) possa acessar os arquivos
+# Ajusta as permissões para o usuário do Apache
 RUN chown -R www-data:www-data /var/www/html/HRConvert2 && \
     chmod -R 0755 /var/www/html/HRConvert2
 
 # Exponha a porta 80
 EXPOSE 80
 
-# Define o comando padrão para iniciar o Apache
+# Comando padrão para iniciar o Apache
 CMD ["apache2-foreground"]
